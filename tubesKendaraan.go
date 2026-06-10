@@ -38,7 +38,7 @@ package main
 
 import "fmt"
 
-const NMAX int = 10 // Konstanta untuk jumlah maksimal array
+const NMAX int = 999 // Konstanta untuk jumlah maksimal array
 
 type kendaraan struct { // Struct menyimpan data kendaraan
 	idPemilik int
