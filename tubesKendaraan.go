@@ -132,9 +132,9 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 		fmt.Println("================================")
 		fmt.Printf("| %-28s |\n", "[1] Daftar Kendaraan")
 		fmt.Printf("| %-28s |\n", "[2] Tambah Kendaraan")
-		fmt.Printf("| %-28s |\n", "[3] Cari Kendaraan")
-		fmt.Printf("| %-28s |\n", "[4] Update Kendaraan")
-		fmt.Printf("| %-28s |\n", "[5] Hapus Kendaraan")
+		fmt.Printf("| %-28s |\n", "[3] Update Kendaraan")
+		fmt.Printf("| %-28s |\n", "[4] Hapus Kendaraan")
+		fmt.Printf("| %-28s |\n", "[5] Cari Kendaraan")
 		fmt.Printf("| %-28s |\n", "[6] Sorting Kendaraan")
 		fmt.Printf("| %-28s |\n", "[0] Exit")
 		fmt.Println("================================")
@@ -148,6 +148,14 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 			tambahKendaraan(kendaraan, n, pemilik, np)
 
 		case 3:
+			fmt.Print("Plat kendaraan yang diupdate  : ")
+			fmt.Scan(&x)
+			updateKendaraan(kendaraan, n, x)
+		case 4:
+			fmt.Print("Plat kendaraan yang ingin dihapus  : ")
+			fmt.Scan(&x)
+			hapusKendaraan(kendaraan, n, x)
+		case 5:
 			fmt.Println("[1] Search berdasarkan plat kendaraan")
 			fmt.Println("[2] Search berdasarkan merk kendaraan")
 			fmt.Println("[3] Search berdasarkan model kendaraan")
@@ -188,14 +196,6 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 				fmt.Scan(&tahun)
 				sequentialSearchTahun(*kendaraan, *n, tahun)
 			}
-		case 4:
-			fmt.Print("Plat kendaraan yang diupdate  : ")
-			fmt.Scan(&x)
-			updateKendaraan(kendaraan, n, x)
-		case 5:
-			fmt.Print("Plat kendaraan yang ingin dihapus  : ")
-			fmt.Scan(&x)
-			hapusKendaraan(kendaraan, n, x)
 		case 6:
 			fmt.Println("[1] Ascending")
 			fmt.Println("[2] Descending")
@@ -542,7 +542,7 @@ func min(kendaraan tabKendaraan, n, i int, kategori string) int {
 			if kendaraan[min].tahun > kendaraan[j].tahun {
 				min = j
 			}
-		default:
+		case "warna" :
 			if kendaraan[min].warna > kendaraan[j].warna {
 				min = j
 			}
