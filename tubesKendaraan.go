@@ -797,8 +797,9 @@ func statistikServis(servis tabServis, ns int) {
 	}
 
 	var tahunCari int
-	var i, bulan int
+	var i, bulan, j int
 	var ada bool
+	var maxBulan, maxKategori
 
 	fmt.Print("Masukkan tahun yang ingin ditampilkan: ")
 	fmt.Scan(&tahunCari)
@@ -843,13 +844,13 @@ func statistikServis(servis tabServis, ns int) {
 	fmt.Println("==============================================================")
 	fmt.Printf("%-12s %-15s %-20s\n", "Bulan", "Jumlah Servis", "Kategori Terbanyak")
 	fmt.Println("--------------------------------------------------------------")
-	maxBulan := 0
+	maxBulan = 0
 	for i = 0; i < 12; i++ {
 		if jumlahBulan[i] == 0 {
 			fmt.Printf("%-12s %-15d %-20s\n", namaBulan[i], 0, "-")
 		} else {
-			maxKategori := 0
-			for j := 1; j < 9; j++ {
+			maxKategori = 0
+			for j = 1; j < 9; j++ {
 				if kategori[i][j] > kategori[i][maxKategori] {
 					maxKategori = j
 				}
