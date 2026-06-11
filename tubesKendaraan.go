@@ -41,12 +41,12 @@ import "fmt"
 const NMAX int = 999 // Konstanta untuk jumlah maksimal array
 
 type kendaraan struct { // Struct menyimpan data kendaraan
-	idPemilik int
+	idPemilik int // untuk mengetahui pemilik dari kendaraan
 	plat      string
 	merk      string
 	model     string
 	warna     string
-	tahun     int
+	tahun     int // tahun produksi kendaraan
 }
 type tabKendaraan [NMAX]kendaraan // Tipe data array untuk menyimpan data kendaraan
 
@@ -61,7 +61,7 @@ type servis struct { // Struct untuk menyimpan data servis kendaraan
 	namaPemilik      string
 	no_telp          string
 	keterangan       string
-	bulan            int
+	bulan            int // untuk statistik
 }
 type tabServis [NMAX]servis // Tipe data array untuk menyimpan data booking dan riwayat servis kendaraan
 
@@ -72,12 +72,23 @@ type pemilik struct { //Struct untuk menyimpan data pemilik kendaraan
 }
 type tabPemilik [NMAX]pemilik // Tipe data array untuk menyimpan data pemilik kendaraan
 
+var namaBulan = [12]string{
+	"Januari", "Februari", "Maret", "April",
+	"Mei", "Juni", "Juli", "Agustus",
+	"September", "Oktober", "November", "Dessember",
+}
+var namaServis = [9]string{
+	"Ringan", "Berkala", "Menengah", "Besar",
+	"Lanjutan", "Mesin", "Rem", "Ban", "Transmisi",
+}
+
 func main() {
 	var kendaraan tabKendaraan //Data kendaraan
 	var servis tabServis       // Data servis
 	var pemilik tabPemilik     // Data pemilik kendaraan
 	var nk, ns, np int         //nk : jumlah data kendaraan, ns : jumlah data servis, np : jumlah data pemilik
 	var pilih int              // Input integer
+
 	pilih = -1
 	for pilih != 0 {
 		menu_utama()
@@ -94,8 +105,6 @@ func main() {
 			statistikServis(servis, ns)
 		case 0:
 			fmt.Println("Terima kasih telah menggunakan aplikasi ini")
-		default:
-			fmt.Println("Pilihan tidak valid")
 		}
 	}
 }
@@ -104,6 +113,7 @@ func menu_utama() {
 	/*
 	   Menampilkan pilihan menu utama aplikasi manajemen kendaraan
 	*/
+	fmt.Println()
 	fmt.Println("==============================================================")
 	fmt.Printf("|%35s%25s|\n", "AUTOCARE 0.5", "")
 	fmt.Printf("|%44s%16s|\n", "APLIKASI MANAJEMEN KENDARAAN", "")
@@ -123,13 +133,14 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 	   Proses : Menampilkan menu untuk melihat, menambah, mencari,mengupdate, menghapus, dan mengurutkan data kendaraan.
 	   FS 	  : Data kendaraan diproses sesuai pilihan pengguna atau keluar dari menu
 	*/
-	var pilih, idx int
-	var x string
-	var sorting int
-	var ascending bool
-	var tahun int
+	var pilih, idx int // pilih : input integer untuk memilih menu manajemen kendaraan, idx : indeks yang dicari
+	var x string       // input string yang akan dicari
+	var sorting int    //input integer untuk memilih mengurutkan berdasarkan ascending atau descening
+	var terurut bool   // untuk sorting ascending atau descending
+	var cariTahun int  // untuk mencari berdasarkan tahun produksi
 
-	for {
+	pilih = -1
+	for pilih != 0 {
 		fmt.Println()
 		fmt.Println("================================")
 		fmt.Printf("| %-28s |\n", "MANAJEMEN KENDARAAN")
@@ -147,17 +158,16 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 
 		switch pilih {
 		case 1:
-			daftarKendaraan(*kendaraan, *n, *pemilik, *np) // tambah pemilik gaa
+			daftarKendaraan(*kendaraan, *n, *pemilik, *np) // memanggil fungsi daftar kendaraan
 		case 2:
-			tambahKendaraan(kendaraan, n, pemilik, np)
-
+			tambahKendaraan(kendaraan, n, pemilik, np) // memanggil fungsi tambah kendaraan
 		case 3:
-			fmt.Print("Plat kendaraan yang diupdate  : ")
-			fmt.Scan(&x)
-			updateKendaraan(kendaraan, n, x)
+			fmt.Print("Plat kendaraan yang ingin diupdate  : ")
+			fmt.Scan(&x)                     // input plat kendaraan yang diupdate
+			updateKendaraan(kendaraan, n, x) // memanggil fungsi update kendaraan
 		case 4:
 			fmt.Print("Plat kendaraan yang ingin dihapus  : ")
-			fmt.Scan(&x)
+			fmt.Scan(&x) // input plat kendaraan yang ingin dihapus
 			hapusKendaraan(kendaraan, n, x)
 		case 5:
 			fmt.Println("[1] Search berdasarkan plat kendaraan")
@@ -167,38 +177,34 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 			fmt.Print("Pilih [1/2/3/4]? ")
 			fmt.Scan(&pilih)
 			switch pilih {
-			case 1:
+			case 1: // binary search berdasarkan plat
 				fmt.Print("Plat kendaraan yang dicari  : ")
 				fmt.Scan(&x)
-				insertionSortPlat(kendaraan, *n, true)
+				insertionSortPlat(kendaraan, *n, true) // mengurutkan data kendaraan sebelum dicari menggunakan binary search
 				idx = binarySearchPlat(*kendaraan, *n, x)
 
 				if idx != -1 {
-
 					fmt.Printf("\nKendaraan dengan plat %s ditemukan\n", x)
 					fmt.Println("========================================================")
-					fmt.Printf("| %-10s | %-12s | %-12s | %-9s |\n",
-						"Plat", "Merk", "Model", "Warna")
+					fmt.Printf("| %-10s | %-12s | %-12s | %-9s |\n", "Plat", "Merk", "Model", "Warna")
 					fmt.Println("========================================================")
-
 					fmt.Printf("| %-10s | %-12s | %-12s | %-9s |\n", kendaraan[idx].plat, kendaraan[idx].merk, kendaraan[idx].model, kendaraan[idx].warna)
 					fmt.Println("========================================================")
 				} else {
 					fmt.Printf("Kendaraan dengan plat %s tidak ditemukan", x)
 				}
-			case 2:
+			case 2: // sequential search berdasarkan merk kendaraan
 				fmt.Print("Merk yang dicari  : ")
-				fmt.Scan(&x)
-
+				fmt.Scan(&x) // input merk yang akan dicari
 				sequentialSearchMerk(*kendaraan, *n, x)
-			case 3:
+			case 3: // sequential search berdasarkan model kendaraan
 				fmt.Print("Model yang dicari  : ")
-				fmt.Scan(&x)
+				fmt.Scan(&x) // input model yang akan dicari
 				sequentialSearchModel(*kendaraan, *n, x)
-			case 4:
+			case 4: // sequential search berdasarkan tahun produksi kendaraan
 				fmt.Print("Tahun yang dicari  : ")
-				fmt.Scan(&tahun)
-				sequentialSearchTahun(*kendaraan, *n, tahun)
+				fmt.Scan(&cariTahun) // input tahun produksi yang akan dicari
+				sequentialSearchTahun(*kendaraan, *n, cariTahun)
 			}
 		case 6:
 			fmt.Println("[1] Ascending")
@@ -206,9 +212,9 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 			fmt.Print("Pilih [1/2]? ")
 			fmt.Scan(&sorting)
 			if sorting == 1 {
-				ascending = true
+				terurut = true // ascending
 			} else {
-				ascending = false
+				terurut = false // descending
 			}
 
 			fmt.Println("[1] Sorting berdasarkan plat kendaraan")
@@ -219,37 +225,32 @@ func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np
 			fmt.Print("Pilih [1/2/3/4/5]? ")
 			fmt.Scan(&pilih)
 			switch pilih {
-			case 1:
-				insertionSortPlat(kendaraan, *n, ascending)
+			case 1: // mengurutkan kendaraan berdasarkan plat kendaraan
+				insertionSortPlat(kendaraan, *n, terurut)
+				daftarKendaraan(*kendaraan, *n, *pemilik, *np) // menampilkan data kendaraan yang sudah diurutkan
+			case 2: // mengurutkan kendaraan berdasarkan merk kendaraan
+				selectionSortKendaraan(kendaraan, *n, terurut, "merk")
 				daftarKendaraan(*kendaraan, *n, *pemilik, *np)
-			case 2:
-				selectionSortKendaraan(kendaraan, *n, ascending, "merk")
+			case 3: // mengurutkan kendaraan berdasarkan model kendaraan
+				selectionSortKendaraan(kendaraan, *n, terurut, "model")
 				daftarKendaraan(*kendaraan, *n, *pemilik, *np)
-			case 3:
-				selectionSortKendaraan(kendaraan, *n, ascending, "nama")
+			case 4: // mengurutkan kendaraan berdasarkan tahun produksi kendaraan
+				selectionSortKendaraan(kendaraan, *n, terurut, "tahun")
 				daftarKendaraan(*kendaraan, *n, *pemilik, *np)
-			case 4:
-				selectionSortKendaraan(kendaraan, *n, ascending, "tahun")
-				daftarKendaraan(*kendaraan, *n, *pemilik, *np)
-			case 5:
-				selectionSortKendaraan(kendaraan, *n, ascending, "warna")
+			case 5: // mengurutkan kendaraan berdasarkan warna kendaraan
+				selectionSortKendaraan(kendaraan, *n, terurut, "warna")
 				daftarKendaraan(*kendaraan, *n, *pemilik, *np)
 			}
-
 		case 0:
-			return
-		default:
-			fmt.Println("Error")
+			fmt.Println("Kembali ke menu utama")
 		}
 	}
 }
 
 func daftarKendaraan(kendaraan tabKendaraan, n int, pemilik tabPemilik, np int) {
-	/*
-	   IS		: Terdefinisi array kendaraan dengan jumlah data n dan array pemilik dengan jumlah data np.
-	   Proses	: Menampilkan daftar kendaraan dengan data pemiliknya
-	   FS		: Daftar kendaraan ditampilkan dilayar
-	*/
+	/*  IS		: Terdefinisi array kendaraan dengan jumlah data n dan array pemilik dengan jumlah data np.
+	Proses	: Menampilkan daftar kendaraan dengan data pemiliknya
+	FS		: Daftar kendaraan ditampilkan dilayar */
 	var i, idxPemilik int
 
 	if n == 0 {
@@ -257,35 +258,26 @@ func daftarKendaraan(kendaraan tabKendaraan, n int, pemilik tabPemilik, np int) 
 	} else {
 
 		fmt.Println("+------------+----------------+----------------+----------------+----------------+----------------+---------+--------------+")
-		fmt.Printf("| %-10s | %-14s | %-14s | %-14s | %-14s | %-14s | %-7s | %-12s |\n",
-			"ID Pemilik", "Nama Pemilik", "No Telepon", "Plat", "Merk", "Model", "Tahun", "Warna")
+		fmt.Printf("| %-10s | %-14s | %-14s | %-14s | %-14s | %-14s | %-7s | %-12s |\n", "ID Pemilik", "Nama Pemilik", "No Telepon", "Plat", "Merk", "Model", "Tahun", "Warna")
 		fmt.Println("+------------+----------------+----------------+----------------+----------------+----------------+---------+--------------+")
 
 		for i = 0; i < n; i++ {
-			idxPemilik = dataPemilik(pemilik, np, kendaraan[i].idPemilik)
+			idxPemilik = dataPemilik(pemilik, np, kendaraan[i].idPemilik) // untuk memeriksa pemilik dari kendaraan, dengan idPemilik mencocokan idPemilik di tab kendaraan dan idPemilik di tab pemilik
 
 			if idxPemilik != -1 {
 				fmt.Printf("| %-10d | %-14s | %-14s | %-14s | %-14s | %-14s | %-7d | %-12s |\n",
-					kendaraan[i].idPemilik,
-					pemilik[idxPemilik].namaPemilik,
-					pemilik[idxPemilik].no_telp,
-					kendaraan[i].plat,
-					kendaraan[i].merk,
-					kendaraan[i].model,
-					kendaraan[i].tahun,
-					kendaraan[i].warna)
+					kendaraan[i].idPemilik, pemilik[idxPemilik].namaPemilik, pemilik[idxPemilik].no_telp,
+					kendaraan[i].plat, kendaraan[i].merk, kendaraan[i].model, kendaraan[i].tahun, kendaraan[i].warna)
 			}
 		}
 		fmt.Println("+------------+----------------+----------------+----------------+----------------+----------------+---------+--------------+")
 	}
 }
 
-func dataPemilik(A tabPemilik, n int, id int) int {
-	/*
-		Mengembalikan indeks pemilik berdasarkan id yang dicari atau -1 jika data tidak ditemukan.
-	*/
+func dataPemilik(A tabPemilik, n int, id int) int { // Memeriksa setiap elemen array pemilik untuk mencari id yang sesuai.
+	/* Mengembalikan indeks pemilik berdasarkan id yang dicari atau -1 jika data tidak ditemukan. */
 	var i int
-	for i = 0; i < n; i++ {
+	for i = 0; i < n; i++ { //
 		if A[i].idPemilik == id {
 			return i
 		}
@@ -294,26 +286,25 @@ func dataPemilik(A tabPemilik, n int, id int) int {
 }
 
 func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *int) {
-	/*
-	   IS		: Terdefinisi array kendaraan dengan jumlah data n dan array pemilik dengan jumlah data np.
-	   Proses	: Menambahkan data kendaraan dan data pemilik jika belum terdaftar
-	   FS		: Data kendaraan tersimpan dan jumlah data bertambah
-	*/
+	/*  IS		: Terdefinisi array kendaraan dengan jumlah data n dan array pemilik dengan jumlah data np.
+	Proses	: Menambahkan data kendaraan dan data pemilik jika belum terdaftar
+	FS		: Data kendaraan tersimpan dan jumlah data bertambah */
 	var idPemilik int
 	var idx int
-	var tambah string
-	var valid bool
+	var tambah string // untuk konfirmasi menambah data kendaraan lagi atau tidak
+	var valid bool    // untuk cek nomor telepon sudah valid berisi 12 atau belum
 
 	tambah = "Ya"
 	for tambah == "Ya" && *n < NMAX {
 		fmt.Print("Masukkan ID Pemilik: ")
 		fmt.Scan(&idPemilik)
-		idx = dataPemilik(*pemilik, *np, idPemilik)
+		idx = dataPemilik(*pemilik, *np, idPemilik) // untuk mencari apakah idPemilik sudah terdaftar
+		// jika belum terdaftar maka harus menambahkan pemilik
 		if idx == -1 {
 			fmt.Printf("Pemilik tidak ditemukan\n")
 			fmt.Println()
 			fmt.Print("Tambahkan data Pemilik \n")
-			(*pemilik)[*np].idPemilik = idPemilik
+			(*pemilik)[*np].idPemilik = idPemilik // jika idPemilik tidak ditemukan, maka idPemilik yang diinput akan menjadi idPemilik baru
 			fmt.Print("Nama Pemilik: ")
 			fmt.Scan(&(*pemilik)[*np].namaPemilik)
 			valid = false
@@ -321,20 +312,20 @@ func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *i
 				fmt.Print("Telepon Pemilik (12 digit): ")
 				fmt.Scan(&(*pemilik)[*np].no_telp)
 
-				if len((*pemilik)[*np].no_telp) == 12 {
+				if len((*pemilik)[*np].no_telp) == 12 { // memeriksa panjang no telepon yang diinput
 					valid = true
 				} else {
 					fmt.Println("Nomor telepon tidak valid! Harus 12 digit.")
 				}
 			}
 
-			idx = *np
-			*np = *np + 1
+			idx = *np     // Indeks pemilik baru disimpan agar dapat digunakan untuk menghubungkan kendaraan dengan pemilik tersebut.
+			*np = *np + 1 // mengupdate jumlah pemilik
 		} else {
-			fmt.Printf("Pemilik dengan ID %d ditemukan: %s\n", idPemilik, (*pemilik)[idx].namaPemilik)
+			fmt.Printf("Pemilik dengan ID %d ditemukan: %s\n", idPemilik, (*pemilik)[idx].namaPemilik) // jika idPemilik sudah terdaftar atau ditemukan
 		}
 
-		(*kendaraan)[*n].idPemilik = (*pemilik)[idx].idPemilik
+		(*kendaraan)[*n].idPemilik = (*pemilik)[idx].idPemilik // menghubungkan pemilik dengan kendaraan
 
 		fmt.Println("Masukkan data kendaraan")
 
@@ -353,23 +344,62 @@ func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *i
 		fmt.Printf("Warna %3s ", ":")
 		fmt.Scan(&kendaraan[*n].warna)
 
-		*n = *n + 1
+		*n = *n + 1 // mengupdate jumlah kendaraan
 
 		fmt.Println("Data Kendaraan berhasil ditambahkan")
 		fmt.Println("Apakah Anda Ingin Menambahkan Kendaraan Lagi?")
 		fmt.Print("Pilih [Ya/Tidak] : ")
 		if *n < NMAX {
-			fmt.Scan(&tambah)
+			fmt.Scan(&tambah) // konfirmasi tambah kendaraan atau tidak selama belum melebihi NMAX
 		} else {
-			fmt.Println("Anda sudah tidak bisa menambahkan kendaraan lagi")
+			fmt.Println("Anda sudah tidak bisa menambahkan kendaraan lagi") // menunjukkan data sudah penuh
 		}
 	}
 }
 
+func updateKendaraan(kendaraan *tabKendaraan, n *int, x string) { // Fungsi untuk mengupdate data kendaraan berdasarkan plat
+	/* IS		: Terdefinisi data kendaraan sebanyak n data dan plat kendaraan yang akan diubah
+	   Proses	: Mengupdate data kendaraan berdasarkan plat yang dicari
+	   FS		: Data kendaraan berhasil diupdate atau tidak ditemukan */
+	var idx int
+
+	idx = cariKendaraan(*kendaraan, *n, x)
+
+	if idx != -1 {
+		fmt.Println("Masukkan Data Baru")
+		fmt.Printf("Plat %4s", ":")
+		fmt.Scan(&(*kendaraan)[idx].plat)
+		fmt.Printf("Warna %3s", ":")
+		fmt.Scan(&(*kendaraan)[idx].warna)
+		fmt.Println("Data kendaraan berhasil diupdate")
+	} else {
+		fmt.Printf("Kendaraan dengan plat %s tidak ditemukan", x)
+	}
+}
+
+func hapusKendaraan(kendaraan *tabKendaraan, n *int, x string) { // Fungsi untuk menghapus data kendaraan berdasarkan plat
+	/* IS		: Terdefinisi data kendaraan sebanyak n data dan plat kendaraan yang akan dihapus
+	   Proses	: Menghapus data kendaraan berdasarkan plat yang dicari
+	   FS		: Data kendaraan berhasil dihapus atau tidak ditemukan */
+	var found, i int
+
+	found = cariKendaraan(*kendaraan, *n, x)
+
+	if found == -1 {
+		fmt.Println("Kendaraan tidak ditemukan")
+	} else {
+		i = found
+		for i <= *n-2 {
+			(*kendaraan)[i] = (*kendaraan)[i+1]
+			i++
+		}
+		*n = *n - 1
+		fmt.Printf("Kendaraan dengan plat %s berhasil dihapus", x)
+	}
+}
+
 func cariKendaraan(kendaraan tabKendaraan, n int, x string) int {
-	/*
-		Mencari kendaraan menggunakan sequential search, digunakan pada fungsi booking, hapus, edit, dll
-	*/
+	/* Mencari kendaraan menggunakan sequential search, digunakan pada fungsi booking, hapus, edit, dll */
 	var idx, i int
 	idx = -1
 	i = 0
@@ -383,64 +413,58 @@ func cariKendaraan(kendaraan tabKendaraan, n int, x string) int {
 }
 
 func sequentialSearchMerk(kendaraan tabKendaraan, n int, x string) {
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data dan merk x yang dicari.
+	/* IS		: Terdefinisi data kendaraan sebanyak n data dan merk x yang dicari.
 	   Proses	: Mencari kendaraan berdasarkan merk menggunakan sequential search
-	   FS		: Menampilkan informasi kendaraan dengan merk yang dicari
-	*/
+	   FS		: Menampilkan informasi kendaraan dengan merk yang dicari */
 	var i int
 	var ditemukan bool
+
 	fmt.Println("========================================================")
-	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "ID", "MERK", "MODEL", "WARNA")
+	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "Plat", "Merk", "Model", "Warna")
 	fmt.Println("========================================================")
 	for i = 0; i < n; i++ {
 		if kendaraan[i].merk == x {
-			fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", kendaraan[i].plat, kendaraan[i].merk,
-				kendaraan[i].model, kendaraan[i].warna)
+			fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", kendaraan[i].plat, kendaraan[i].merk, kendaraan[i].model, kendaraan[i].warna)
 			ditemukan = true
 		}
 	}
 	fmt.Println("========================================================")
 	if !ditemukan {
-		fmt.Println("Kendaraan tidak ditemukan")
+		fmt.Printf("Kendaraan dengan merk %s tidak ditemukan", x)
 	}
 }
 
 func sequentialSearchModel(kendaraan tabKendaraan, n int, x string) {
-	/*
-	    IS		: Terdefinisi data kendaraan sebanyak n data dan model x yang dicari.
-	   Proses	: Mencari kendaraan berdasarkan model menggunakan sequential search
-	   FS		: Menampilkan informasi kendaraan dengan model yang dicari
-	*/
+	/*  IS		: Terdefinisi data kendaraan sebanyak n data dan model x yang dicari.
+	Proses	: Mencari kendaraan berdasarkan model menggunakan sequential search
+	FS		: Menampilkan informasi kendaraan dengan model yang dicari */
 	var i int
 	var ditemukan bool
+
 	fmt.Println("========================================================")
-	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "ID", "MERK", "MODEL", "WARNA")
+	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "Plat", "Merk", "Model", "Warna")
 	fmt.Println("========================================================")
 	for i = 0; i < n; i++ {
 		if kendaraan[i].model == x {
-			fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", kendaraan[i].plat, kendaraan[i].merk,
-				kendaraan[i].model, kendaraan[i].warna)
+			fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", kendaraan[i].plat, kendaraan[i].merk, kendaraan[i].model, kendaraan[i].warna)
 			ditemukan = true
 		}
 	}
 	fmt.Println("========================================================")
 	if !ditemukan {
-		fmt.Println("Kendaraan tidak ditemukan")
+		fmt.Printf("Kendaraan dengan model %s tidak ditemukan", x)
 	}
 
 }
 
 func sequentialSearchTahun(kendaraan tabKendaraan, n int, x int) {
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data dan tahun x yang dicari.
+	/* IS		: Terdefinisi data kendaraan sebanyak n data dan tahun x yang dicari.
 	   Proses	: Mencari kendaraan berdasarkan tahun menggunakan sequential search
-	   FS		: Menampilkan informasi kendaraan dengan tahun yang dicari
-	*/
+	   FS		: Menampilkan informasi kendaraan dengan tahun yang dicari */
 	var i int
 	var ditemukan bool
-	fmt.Println("========================================================")
-	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "ID", "MERK", "MODEL", "WARNA")
+	fmt.Println("=======================================================")
+	fmt.Printf("| %-8s | %-12s | %-12s | %-10s |\n", "Plat", "Merk", "Model", "Warna")
 	fmt.Println("========================================================")
 	for i = 0; i < n; i++ {
 		if kendaraan[i].tahun == x {
@@ -451,14 +475,12 @@ func sequentialSearchTahun(kendaraan tabKendaraan, n int, x int) {
 	}
 	fmt.Println("========================================================")
 	if !ditemukan {
-		fmt.Println("Kendaraan tidak ditemukan")
+		fmt.Printf("Kendaraan dengan tahun %d tidak ditemukan", x)
 	}
 }
 
 func binarySearchPlat(kendaraan tabKendaraan, n int, x string) int {
-	/*
-		Mengembalikan indeks data kendaraan berdasarkan plat yang dicari mmenggunakan binary search
-	*/
+	/* Mengembalikan indeks data kendaraan berdasarkan plat yang dicari mmenggunakan binary search */
 	var left, right, mid, idx int
 
 	idx = -1
@@ -478,57 +500,12 @@ func binarySearchPlat(kendaraan tabKendaraan, n int, x string) int {
 	return idx
 }
 
-func hapusKendaraan(kendaraan *tabKendaraan, n *int, x string) { // Fungsi untuk menghapus data kendaraan berdasarkan plat
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data dan plat kendaraan yang akan dihapus
-	   Proses	: Menghapus data kendaraan berdasarkan plat yang dicari
-	   FS		: Data kendaraan berhasil dihapus atau tidak ditemukan
-	*/
-	var found, i int
-	found = cariKendaraan(*kendaraan, *n, x)
-	if found == -1 {
-		fmt.Println("Kendaraan tidak ditemukan")
-	} else {
-		i = found
-		for i <= *n-2 {
-			(*kendaraan)[i] = (*kendaraan)[i+1]
-			i++
-		}
-		*n = *n - 1
-		fmt.Printf("Kendaraan dengan plat %s berhasil dihapus", x)
-	}
-}
-
-func updateKendaraan(kendaraan *tabKendaraan, n *int, x string) { // Fungsi untuk mengupdate data kendaraan berdasarkan plat
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data dan plat kendaraan yang akan diubah
-	   Proses	: Mengupdate data kendaraan berdasarkan plat yang dicari
-	   FS		: Data kendaraan berhasil diupdate atau tidak ditemukan
-	*/
-	var idx int
-
-	idx = cariKendaraan(*kendaraan, *n, x)
-
-	if idx != -1 {
-		fmt.Println("Masukkan Data Baru")
-		fmt.Printf("Plat %4s", ":")
-		fmt.Scan(&(*kendaraan)[idx].plat)
-		fmt.Printf("Warna %3s", ":")
-		fmt.Scan(&(*kendaraan)[idx].warna)
-		fmt.Println("Data kendaraan berhasil diupdate")
-	} else {
-		fmt.Println("Kendaraan tidak ditemukan")
-	}
-}
-
-func min(kendaraan tabKendaraan, n, i int, kategori string) int {
-	/*
-	   Menghasilkan indeks data kendaraan dengan nilai terkecil berdasarkan kategori yang dipilih.
-	*/
+func min(kendaraan tabKendaraan, n, i int, kategori string) int { // digunakan untuk selectionSort secara ascending
+	/* Mengembalikan indeks data kendaraan dengan nilai terkecil berdasarkan kategori yang dipilih. */
 	var min, j int
 	min = i
-	for j = i + 1; j < n; j++ {
 
+	for j = i + 1; j < n; j++ {
 		switch kategori {
 		case "plat":
 			if kendaraan[min].plat > kendaraan[j].plat {
@@ -555,14 +532,12 @@ func min(kendaraan tabKendaraan, n, i int, kategori string) int {
 	return min
 }
 
-func max(kendaraan tabKendaraan, n, i int, kategori string) int {
-	/*
-	  Menghasilkan indeks data kendaraan dengan nilai terkecil berdasarkan kategori yang dipilih.
-	*/
+func max(kendaraan tabKendaraan, n, i int, kategori string) int { // digunakan untuk selectionSort secara descending
+	/* Mengembalikan indeks data kendaraan dengan nilai terkecil berdasarkan kategori yang dipilih. */
 	var max, j int
 	max = i
-	for j = i + 1; j < n; j++ {
 
+	for j = i + 1; j < n; j++ {
 		switch kategori {
 		case "plat":
 			if kendaraan[max].plat < kendaraan[j].plat {
@@ -590,11 +565,9 @@ func max(kendaraan tabKendaraan, n, i int, kategori string) int {
 }
 
 func selectionSortKendaraan(k *tabKendaraan, n int, Ascending bool, kategori string) {
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data
+	/* IS		: Terdefinisi data kendaraan sebanyak n data
 	   Proses	: Mengurutkan data kendaraan menggunakan selection sort berdasarkan kategori yang dipilih
-	   FS		: Data kendaraan terurut secara ascending atau descending
-	*/
+	   FS		: Data kendaraan terurut secara ascending atau descending */
 	var temp kendaraan
 	var idx int
 	var i int
@@ -612,11 +585,9 @@ func selectionSortKendaraan(k *tabKendaraan, n int, Ascending bool, kategori str
 }
 
 func insertionSortPlat(k *tabKendaraan, n int, Ascending bool) {
-	/*
-	   IS		: Terdefinisi data kendaraan sebanyak n data
+	/* IS		: Terdefinisi data kendaraan sebanyak n data
 	   Proses   : Mengurutkan data kendaraan berdasarkan plat menggunakan insertion sort berdasarkan kategori yang dipilih
-	   FS		: Data kendaraan terurut secara ascending atau descending berdasarkan plat
-	*/
+	   FS		: Data kendaraan terurut secara ascending atau descending berdasarkan plat */
 	var temp kendaraan
 	var pass, i int
 
@@ -641,11 +612,9 @@ func insertionSortPlat(k *tabKendaraan, n int, Ascending bool) {
 }
 
 func servisKendaraanKM(jenisServis *string, keterangan *string) {
-	/*
-	   IS		: Jenis dan keterangan servis kendaraan belum diketahui.
+	/* IS		: Jenis dan keterangan servis kendaraan belum diketahui.
 	   Proses	: Input kilometer kendaraan kemudian menentukan kategori servis berdasarkan kilometer kendaraan
-	   FS		: Jenis dan keterangan servis kendaraan telah diketahui.
-	*/
+	   FS		: Jenis dan keterangan servis kendaraan telah diketahui. */
 	var km float64
 	fmt.Printf("Kilometer Kendaraan %9s ", ":")
 	fmt.Scan(&km)
@@ -669,11 +638,9 @@ func servisKendaraanKM(jenisServis *string, keterangan *string) {
 }
 
 func servisKendaraanKerusakan(jenisServis, keterangan *string) {
-	/*
-	   IS		: Jenis dan keterangan servis kendaraan belum diketahui.
+	/* IS		: Jenis dan keterangan servis kendaraan belum diketahui.
 	   Proses	: Input kerusakan kendaraan kemudian menentukan kategori servis berdasarkan kerusakan kendaraan
-	   FS		: Jenis dan keterangan servis kendaraan telah diketahui.
-	*/
+	   FS		: Jenis dan keterangan servis kendaraan telah diketahui. */
 	var kerusakan string
 	fmt.Println("JENIS KERUSAKAN")
 	fmt.Println("1. Mesin")
@@ -708,11 +675,9 @@ func servisKendaraanKerusakan(jenisServis, keterangan *string) {
 }
 
 func tambahRiwayatServis(kendaraan tabKendaraan, pemilik tabPemilik, servis *tabServis, nk int, np int, ns *int) {
-	/*
-	   IS		: Terdefinisi array kendaraan dengan jumlah data nk, array pemilik dengan jumlah data np, dan array servis dengan jumlah data ns.
+	/* IS		: Terdefinisi array kendaraan dengan jumlah data nk, array pemilik dengan jumlah data np, dan array servis dengan jumlah data ns.
 	   Proses	: Melakukan tambah riwayat servis kendaraan
-	   FS		: Data Riwayat servis baru tersimpan
-	*/
+	   FS		: Data Riwayat servis baru tersimpan */
 	var x string
 	var idx, pilih int
 
@@ -752,11 +717,9 @@ func tambahRiwayatServis(kendaraan tabKendaraan, pemilik tabPemilik, servis *tab
 }
 
 func riwayatServis(servis tabServis, ns int) {
-	/*
-	   IS      : Terdefinisi array servis dengan jumlah data ns
+	/* IS      : Terdefinisi array servis dengan jumlah data ns
 	   Proses  : Menampilkan seluruh data riwayat servis kendaraan
-	   FS      : Riwayat servis ditampilkan di layar
-	*/
+	   FS      : Riwayat servis ditampilkan di layar */
 	var i int
 
 	if ns == 0 {
@@ -777,26 +740,13 @@ func riwayatServis(servis tabServis, ns int) {
 		fmt.Println("+------+----------------+--------------+------------+------------+------------+------------+------------------+")
 	}
 }
+
 func statistikServis(servis tabServis, ns int) {
-	/*
-	   IS : tersedia data servis sebanyak ns
-	   FS : menampilkan statistik jumlah servis per bulan
-	        pada tahun tertentu dan kategori servis
-	        yang paling sering muncul
-	*/
+	/* IS : Terdefinisi data servis sebanyak ns
+	   FS : Menampilkan statistik jumlah servis per bulan pada tahun tertentu dan kategori servis yang paling sering muncul */
 
 	var jumlahBulan [12]int
 	var kategori [12][9]int
-
-	var namaBulan = [12]string{
-		"Januari", "Februari", "Maret", "April",
-		"Mei", "Juni", "Juli", "Agustus",
-		"September", "Oktober", "November", "Dessember",
-	}
-	var namaServis = [9]string{
-		"Ringan", "Berkala", "Menengah", "Besar",
-		"Lanjutan", "Mesin", "Rem", "Ban", "Transmisi",
-	}
 
 	var tahunCari int
 	var i, bulan, j int
