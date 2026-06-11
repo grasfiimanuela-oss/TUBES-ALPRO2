@@ -1,5 +1,3 @@
-// WOI INI YANG DIPAKE YA YANG TERBARU
-
 /*
 Nama Anggota :
  1. Thania Evelina Munte (103012500239)
