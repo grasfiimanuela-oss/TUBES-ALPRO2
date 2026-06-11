@@ -78,26 +78,28 @@ func main() {
 	var pemilik tabPemilik     // Data pemilik kendaraan
 	var nk, ns, np int         //nk : jumlah data kendaraan, ns : jumlah data servis, np : jumlah data pemilik
 	var pilih int              // Input integer
-
+	pilih = -1
 	for pilih != 0 {
-	menu_utama()
-	fmt.Scan(&pilih)
+		menu_utama()
+		fmt.Scan(&pilih)
 
-	switch pilih {
-	case 1:
-		manajemenKendaraan(&kendaraan, &nk, &pemilik, &np)
-	case 2:
-		tambahRiwayatServis(kendaraan, pemilik, &servis, nk, np, &ns)
-	case 3:
-		riwayatServis(servis, ns)
-	case 4:
-		statistikServis(servis, ns)
-	case 0:
-		fmt.Println("Terima kasih telah menggunakan aplikasi ini")
-	default:
-		fmt.Println("Pilihan tidak valid")
+		switch pilih {
+		case 1:
+			manajemenKendaraan(&kendaraan, &nk, &pemilik, &np)
+		case 2:
+			tambahRiwayatServis(kendaraan, pemilik, &servis, nk, np, &ns)
+		case 3:
+			riwayatServis(servis, ns)
+		case 4:
+			statistikServis(servis, ns)
+		case 0:
+			fmt.Println("Terima kasih telah menggunakan aplikasi ini")
+		default:
+			fmt.Println("Pilihan tidak valid")
+		}
 	}
 }
+
 func menu_utama() {
 	/*
 	   Menampilkan pilihan menu utama aplikasi manajemen kendaraan
@@ -544,7 +546,7 @@ func min(kendaraan tabKendaraan, n, i int, kategori string) int {
 			if kendaraan[min].tahun > kendaraan[j].tahun {
 				min = j
 			}
-		case "warna" :
+		case "warna":
 			if kendaraan[min].warna > kendaraan[j].warna {
 				min = j
 			}
@@ -799,7 +801,7 @@ func statistikServis(servis tabServis, ns int) {
 	var tahunCari int
 	var i, bulan, j int
 	var ada bool
-	var maxBulan, maxKategori
+	var maxBulan, maxKategori int
 
 	fmt.Print("Masukkan tahun yang ingin ditampilkan: ")
 	fmt.Scan(&tahunCari)
