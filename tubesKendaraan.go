@@ -79,9 +79,9 @@ func main() {
 	var nk, ns, np int         //nk : jumlah data kendaraan, ns : jumlah data servis, np : jumlah data pemilik
 	var pilih int              // Input integer
 
-	for {
-		menu_utama()
-		fmt.Scan(&pilih)
+	menu_utama()
+	fmt.Scan(&pilih)
+	for pilih != 0{
 		switch pilih {
 		case 1:
 			manajemenKendaraan(&kendaraan, &nk, &pemilik, &np)
@@ -91,11 +91,9 @@ func main() {
 			riwayatServis(servis, ns)
 		case 4:
 			statistikServis(servis, ns)
-		case 0:
-			fmt.Println("Terima kasih telah menggunakan aplikasi ini")
-			return
 		}
 	}
+	fmt.Println("Terima kasih telah menggunakan aplikasi ini")
 
 }
 func menu_utama() {
