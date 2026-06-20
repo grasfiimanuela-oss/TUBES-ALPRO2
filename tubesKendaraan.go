@@ -303,6 +303,17 @@ func dataPemilik(A tabPemilik, n int, id int) int { // Memeriksa setiap elemen a
 	return -1
 }
 
+func dataPemilik(A tabPemilik, n, id, i int) int {
+	/* Mengembalikan indeks pemilik jika ditemukan, atau -1 jika tidak ditemukan.*/
+	if i >= n { // jika indeks sudah melewati data terakhir, berarti id tidak ditemukan
+		return -1
+	}
+	if A[i].idPemilik == id { // jika id pada indeks ke-i sesuai dengan id yang dicari
+		return i
+	}
+	return dataPemilik(A, n, id, i+1) // lanjut mencari ke indeks berikutnya
+}
+
 func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *int) {
 	/*  IS		: Terdefinisi array kendaraan dengan jumlah data n dan array pemilik dengan jumlah data np.
 	Proses	: Menambahkan data kendaraan dan data pemilik jika belum terdaftar
