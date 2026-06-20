@@ -17,9 +17,9 @@ Fitur :
  1. Manajemen Kendaraan:
     -Menampilkan daftar data kendaraan
     -Menambah Data Kendaraan & Data Pemilik
-	-Mengupdate Data Kendaraan
-    -Menghapus Data Kendaraan
     -Mencari Data Kendaraan berdaasarkan Plat, Merk, Model, Tahun
+    -Mengupdate Data Kendaraan
+    -Menghapus Data Kendaraan
     -Menyortir Data Kendaraan berdasarkan Plat, Merk, Model,Tahun, Warna secara ascending maupun descending
 
  2. Tambah Riwayat Servis Kendaraan
@@ -36,7 +36,7 @@ package main
 
 import "fmt"
 
-const NMAX int = 999 // Konstanta untuk jumlah maksimal array
+const NMAX int = 99 // Konstanta untuk jumlah maksimal array
 
 type kendaraan struct { // Struct menyimpan data kendaraan
 	idPemilik int // untuk mengetahui pemilik dari kendaraan
@@ -70,14 +70,30 @@ type pemilik struct { //Struct untuk menyimpan data pemilik kendaraan
 }
 type tabPemilik [NMAX]pemilik // Tipe data array untuk menyimpan data pemilik kendaraan
 
-var namaBulan = [12]string{
-	"Januari", "Februari", "Maret", "April",
-	"Mei", "Juni", "Juli", "Agustus",
-	"September", "Oktober", "November", "Dessember",
-}
-var namaServis = [9]string{
-	"Ringan", "Berkala", "Menengah", "Besar",
-	"Lanjutan", "Mesin", "Rem", "Ban", "Transmisi",
+func dataDummy(kendaraans *tabKendaraan, pemiliks *tabPemilik, nk, np *int) {
+	/* IS : kendaraan, pemilik, nk, np terdefinisi
+	   FS :
+	   - Array pemilik berisi data awal pemilik.
+	   - Array kendaraan berisi data awal kendaraan.
+	   - np dan nk berisi jumlah data awal.
+	*/
+	// DATA PEMILIK
+	(*pemiliks)[0] = pemilik{"Andi", "081234567890", 101}
+	(*pemiliks)[1] = pemilik{"Budi", "082345678901", 102}
+	(*pemiliks)[2] = pemilik{"Citra", "083456789012", 103}
+	(*pemiliks)[3] = pemilik{"Dina", "084567890123", 104}
+	(*pemiliks)[4] = pemilik{"Eko", "085678901234", 105}
+
+	*np = 5
+
+	// DATA KENDARAAN
+	(*kendaraans)[0] = kendaraan{101, "B1234ABC", "Toyota", "Avanza", "Hitam", 2020}
+	(*kendaraans)[1] = kendaraan{102, "D5678DEF", "Honda", "Brio", "Putih", 2021}
+	(*kendaraans)[2] = kendaraan{103, "F9876XYZ", "Suzuki", "Ertiga", "Merah", 2019}
+	(*kendaraans)[3] = kendaraan{104, "B4321AAA", "Toyota", "Innova", "Silver", 2022}
+	(*kendaraans)[4] = kendaraan{105, "Z1111ZZZ", "Honda", "HRV", "Hitam", 2023}
+
+	*nk = 5
 }
 
 func main() {
@@ -87,6 +103,7 @@ func main() {
 	var nk, ns, np int         //nk : jumlah data kendaraan, ns : jumlah data servis, np : jumlah data pemilik
 	var pilih int              // Input integer
 
+	dataDummy(&kendaraan, &pemilik, &nk, &np)
 	pilih = -1
 	for pilih != 0 {
 		menu_utama()
@@ -102,7 +119,10 @@ func main() {
 		case 4:
 			statistikServis(servis, ns)
 		case 0:
-			fmt.Println("Terima kasih telah menggunakan aplikasi ini")
+			fmt.Println()
+			fmt.Println("----Terima kasih telah menggunakan aplikasi ini----")
+		default:
+			fmt.Println("Pilihan Tidak Valid")
 		}
 	}
 }
@@ -293,66 +313,71 @@ func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *i
 	var valid bool    // untuk cek nomor telepon sudah valid berisi 12 atau belum
 
 	tambah = "Ya"
-	for tambah == "Ya" && *n < NMAX {
-		fmt.Print("Masukkan ID Pemilik: ")
-		fmt.Scan(&idPemilik)
-		idx = dataPemilik(*pemilik, *np, idPemilik) // untuk mencari apakah idPemilik sudah terdaftar
-		// jika belum terdaftar maka harus menambahkan pemilik
-		if idx == -1 {
-			fmt.Printf("Pemilik tidak ditemukan\n")
-			fmt.Println()
-			fmt.Print("Tambahkan data Pemilik \n")
-			(*pemilik)[*np].idPemilik = idPemilik // jika idPemilik tidak ditemukan, maka idPemilik yang diinput akan menjadi idPemilik baru
-			fmt.Print("Nama Pemilik: ")
-			fmt.Scan(&(*pemilik)[*np].namaPemilik)
-			valid = false
-			for !valid {
-				fmt.Print("Telepon Pemilik (12 digit): ")
-				fmt.Scan(&(*pemilik)[*np].no_telp)
+	if *n >= NMAX {
+		fmt.Println("Data sudah penuh, anda tidak dapat menambah data lagi")
+	} else {
+		for tambah == "Ya" {
+			fmt.Print("Masukkan ID Pemilik: ")
+			fmt.Scan(&idPemilik)
+			idx = dataPemilik(*pemilik, *np, idPemilik) // untuk mencari apakah idPemilik sudah terdaftar
+			// jika belum terdaftar maka harus menambahkan pemilik
+			if idx == -1 {
+				fmt.Printf("Pemilik tidak ditemukan\n")
+				fmt.Println()
+				fmt.Print("Tambahkan data Pemilik \n")
+				(*pemilik)[*np].idPemilik = idPemilik // jika idPemilik tidak ditemukan, maka idPemilik yang diinput akan menjadi idPemilik baru
+				fmt.Print("Nama Pemilik: ")
+				fmt.Scan(&(*pemilik)[*np].namaPemilik)
+				valid = false
+				for !valid {
+					fmt.Print("Telepon Pemilik (12 digit): ")
+					fmt.Scan(&(*pemilik)[*np].no_telp)
 
-				if len((*pemilik)[*np].no_telp) == 12 { // memeriksa panjang no telepon yang diinput
-					valid = true
-				} else {
-					fmt.Println("Nomor telepon tidak valid! Harus 12 digit.")
+					if len((*pemilik)[*np].no_telp) == 12 { // memeriksa panjang no telepon yang diinput
+						valid = true
+					} else {
+						fmt.Println("Nomor telepon tidak valid! Harus 12 digit.")
+					}
 				}
+
+				idx = *np     // Indeks pemilik baru disimpan agar dapat digunakan untuk menghubungkan kendaraan dengan pemilik tersebut.
+				*np = *np + 1 // mengupdate jumlah pemilik
+			} else {
+				fmt.Printf("Pemilik dengan ID %d ditemukan: %s\n", idPemilik, (*pemilik)[idx].namaPemilik) // jika idPemilik sudah terdaftar atau ditemukan
 			}
 
-			idx = *np     // Indeks pemilik baru disimpan agar dapat digunakan untuk menghubungkan kendaraan dengan pemilik tersebut.
-			*np = *np + 1 // mengupdate jumlah pemilik
-		} else {
-			fmt.Printf("Pemilik dengan ID %d ditemukan: %s\n", idPemilik, (*pemilik)[idx].namaPemilik) // jika idPemilik sudah terdaftar atau ditemukan
-		}
+			(*kendaraan)[*n].idPemilik = (*pemilik)[idx].idPemilik // menghubungkan pemilik dengan kendaraan
 
-		(*kendaraan)[*n].idPemilik = (*pemilik)[idx].idPemilik // menghubungkan pemilik dengan kendaraan
+			fmt.Println("Masukkan data kendaraan")
 
-		fmt.Println("Masukkan data kendaraan")
+			fmt.Printf("Plat %4s ", ":")
+			fmt.Scan(&kendaraan[*n].plat)
 
-		fmt.Printf("Plat %4s ", ":")
-		fmt.Scan(&kendaraan[*n].plat)
+			fmt.Printf("Merk %4s ", ":")
+			fmt.Scan(&kendaraan[*n].merk)
 
-		fmt.Printf("Merk %4s ", ":")
-		fmt.Scan(&kendaraan[*n].merk)
+			fmt.Printf("Model %3s ", ":")
+			fmt.Scan(&kendaraan[*n].model)
 
-		fmt.Printf("Model %3s ", ":")
-		fmt.Scan(&kendaraan[*n].model)
+			fmt.Printf("Tahun %3s ", ":")
+			fmt.Scan(&kendaraan[*n].tahun)
 
-		fmt.Printf("Tahun %3s ", ":")
-		fmt.Scan(&kendaraan[*n].tahun)
+			fmt.Printf("Warna %3s ", ":")
+			fmt.Scan(&kendaraan[*n].warna)
 
-		fmt.Printf("Warna %3s ", ":")
-		fmt.Scan(&kendaraan[*n].warna)
+			*n = *n + 1 // mengupdate jumlah kendaraan
 
-		*n = *n + 1 // mengupdate jumlah kendaraan
-
-		fmt.Println("Data Kendaraan berhasil ditambahkan")
-		fmt.Println("Apakah Anda Ingin Menambahkan Kendaraan Lagi?")
-		fmt.Print("Pilih [Ya/Tidak] : ")
-		if *n < NMAX {
-			fmt.Scan(&tambah) // konfirmasi tambah kendaraan atau tidak selama belum melebihi NMAX
-		} else {
-			fmt.Println("Anda sudah tidak bisa menambahkan kendaraan lagi") // menunjukkan data sudah penuh
+			fmt.Println("Data Kendaraan berhasil ditambahkan")
+			fmt.Println("Apakah Anda Ingin Menambahkan Kendaraan Lagi?")
+			fmt.Print("Pilih [Ya/Tidak] : ")
+			if *n < NMAX {
+				fmt.Scan(&tambah) // konfirmasi tambah kendaraan atau tidak selama belum melebihi NMAX
+			} else {
+				fmt.Println("Data sudah penuh, anda tidak dapat menambah data lagi") // menunjukkan data sudah penuh
+			}
 		}
 	}
+
 }
 
 func updateKendaraan(kendaraan *tabKendaraan, n *int, x string) { // Fungsi untuk mengupdate data kendaraan berdasarkan plat
@@ -616,6 +641,7 @@ func servisKendaraanKM(jenisServis *string, keterangan *string) {
 	var km float64
 	fmt.Printf("Kilometer Kendaraan %9s ", ":")
 	fmt.Scan(&km)
+	fmt.Println()
 
 	if km >= 5000 && km <= 10000 {
 		*jenisServis = "Servis Ringan"
@@ -648,6 +674,7 @@ func servisKendaraanKerusakan(jenisServis, keterangan *string) {
 	fmt.Println("5. Servis Lanjutan")
 	fmt.Printf("Jenis Kerusakan %10s", ":")
 	fmt.Scan(&kerusakan)
+	fmt.Println()
 
 	switch kerusakan {
 	case "Mesin":
@@ -677,41 +704,57 @@ func tambahRiwayatServis(kendaraan tabKendaraan, pemilik tabPemilik, servis *tab
 	   Proses	: Melakukan tambah riwayat servis kendaraan
 	   FS		: Data Riwayat servis baru tersimpan */
 	var x string
-	var idx, pilih int
+	var idx, pilih, idxpemilik int
 
-	fmt.Println("Masukan data kendaraan")
-	fmt.Printf("Plat %24s ", ":")
-	fmt.Scan(&x)
-	idx = cariKendaraan(kendaraan, nk, x)
-
-	if idx != -1 {
-		fmt.Println("PILIH SERVIS KENDARAAN")
-		fmt.Println("[1] Servis berdasarkan kilometer")
-		fmt.Println("[2] Servis berdasarkan kerusakan")
-		fmt.Print("Pilih [1/2]? ")
-		fmt.Scan(&pilih)
-		if pilih == 1 {
-			servisKendaraanKM(&(*servis)[*ns].jenisServis, &(*servis)[*ns].keterangan)
-		} else if pilih == 2 {
-			servisKendaraanKerusakan(&(*servis)[*ns].jenisServis, &(*servis)[*ns].keterangan)
-		}
-		(*servis)[*ns].idServis = *ns + 1
-		(*servis)[*ns].plat = kendaraan[idx].plat
-		(*servis)[*ns].merk = kendaraan[idx].merk
-		(*servis)[*ns].model = kendaraan[idx].model
-		(*servis)[*ns].tahun = kendaraan[idx].tahun
-		(*servis)[*ns].warna = kendaraan[idx].warna
-
-		(*servis)[*ns].namaPemilik = pemilik[idx].namaPemilik
-		(*servis)[*ns].no_telp = pemilik[idx].no_telp
-		fmt.Printf("Tanggal Servis [dd mm yyyy] %1s ", ":")
-		fmt.Scan(&(*servis)[*ns].day, &(*servis)[*ns].month, &(*servis)[*ns].year)
-
-		fmt.Println("Tambah riwayat servis berhasil dilakukan")
-		*ns = *ns + 1
+	if *ns >= NMAX {
+		fmt.Println("Data servis sudah penuh, tidak dapat menambah riwayat servis.")
 	} else {
-		fmt.Println("Kendaraan tidak ditemukan")
+		fmt.Println("Masukan data kendaraan")
+		fmt.Printf("Plat %24s ", ":")
+		fmt.Scan(&x)
+		idx = cariKendaraan(kendaraan, nk, x)
+
+		if idx != -1 {
+			fmt.Println("PILIH SERVIS KENDARAAN")
+			fmt.Println("[1] Servis berdasarkan kilometer")
+			fmt.Println("[2] Servis berdasarkan kerusakan")
+			fmt.Print("Pilih [1/2]? ")
+			fmt.Scan(&pilih)
+			fmt.Println()
+
+			for pilih != 1 && pilih != 2 {
+				fmt.Println("Pilihan tidak valid!")
+				fmt.Print("Silahkan pilih ulang: ")
+				fmt.Scan(&pilih)
+			}
+
+			if pilih == 1 {
+				servisKendaraanKM(&(*servis)[*ns].jenisServis, &(*servis)[*ns].keterangan)
+			} else if pilih == 2 {
+				servisKendaraanKerusakan(&(*servis)[*ns].jenisServis, &(*servis)[*ns].keterangan)
+			}
+			(*servis)[*ns].idServis = *ns + 1
+			(*servis)[*ns].plat = kendaraan[idx].plat
+			(*servis)[*ns].merk = kendaraan[idx].merk
+			(*servis)[*ns].model = kendaraan[idx].model
+			(*servis)[*ns].tahun = kendaraan[idx].tahun
+			(*servis)[*ns].warna = kendaraan[idx].warna
+
+			idxpemilik = dataPemilik(pemilik, np, kendaraan[idx].idPemilik)
+			(*servis)[*ns].namaPemilik = pemilik[idxpemilik].namaPemilik // Disambungin dulu kendaraan sama pemiliknya pake binary
+			(*servis)[*ns].no_telp = pemilik[idxpemilik].no_telp
+			fmt.Printf("Tanggal Servis [dd mm yyyy] %1s ", ":")
+			fmt.Scan(&(*servis)[*ns].day, &(*servis)[*ns].month, &(*servis)[*ns].year)
+
+			fmt.Println()
+			fmt.Println("Tambah riwayat servis berhasil dilakukan")
+			fmt.Println()
+			*ns = *ns + 1
+		} else {
+			fmt.Println("Kendaraan tidak ditemukan")
+		}
 	}
+
 }
 
 func riwayatServis(servis tabServis, ns int) {
@@ -745,6 +788,16 @@ func statistikServis(servis tabServis, ns int) {
 
 	var jumlahBulan [12]int
 	var kategori [12][9]int
+
+	var namaBulan = [12]string{
+		"Januari", "Februari", "Maret", "April",
+		"Mei", "Juni", "Juli", "Agustus",
+		"September", "Oktober", "November", "Dessember",
+	}
+	var namaServis = [9]string{
+		"Ringan", "Berkala", "Menengah", "Besar",
+		"Lanjutan", "Mesin", "Rem", "Ban", "Transmisi",
+	}
 
 	var tahunCari int
 	var i, bulan, j int
