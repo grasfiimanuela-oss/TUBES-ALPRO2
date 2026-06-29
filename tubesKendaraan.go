@@ -34,7 +34,7 @@ import "fmt"
 
 const NMAX int = 99 // Konstanta untuk jumlah maksimal array
 
-type kendaraan struct { // Struct menyimpan data kendaraan
+type kendaraan struct { // Struct menyimpan informasi data kendaraan
 	idPemilik int // untuk mengetahui pemilik dari kendaraan
 	plat      string
 	merk      string
@@ -44,7 +44,7 @@ type kendaraan struct { // Struct menyimpan data kendaraan
 }
 type tabKendaraan [NMAX]kendaraan // Tipe data array untuk menyimpan data kendaraan
 
-type servis struct { // Struct untuk menyimpan data servis kendaraan
+type servis struct { // Struct untuk menyimpan informasi data servis kendaraan
 	idServis         int
 	plat             string
 	merk, warna      string
@@ -59,7 +59,7 @@ type servis struct { // Struct untuk menyimpan data servis kendaraan
 
 type tabServis [NMAX]servis // Tipe data array untuk menyimpan data booking dan riwayat servis kendaraan
 
-type pemilik struct { //Struct untuk menyimpan data pemilik kendaraan
+type pemilik struct { //Struct untuk menyimpan informasi data pemilik kendaraan
 	namaPemilik string
 	no_telp     string
 	idPemilik   int
