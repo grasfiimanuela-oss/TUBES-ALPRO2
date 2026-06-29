@@ -27,10 +27,6 @@ Fitur :
 
  3. Riwayat Servis
     Menampilkan riwayat servis kendaraan
-
- 4. Statistik Servis Kendaraan
-    Menampilkan statistik jumlah kendaraan yang diservis perbulan dan kategoori kerusakan yang paling sering
-    muncul.
 */
 package main
 
@@ -59,8 +55,8 @@ type servis struct { // Struct untuk menyimpan data servis kendaraan
 	namaPemilik      string
 	no_telp          string
 	keterangan       string
-	bulan            int // untuk statistik
 }
+
 type tabServis [NMAX]servis // Tipe data array untuk menyimpan data booking dan riwayat servis kendaraan
 
 type pemilik struct { //Struct untuk menyimpan data pemilik kendaraan
@@ -116,8 +112,6 @@ func main() {
 			tambahRiwayatServis(kendaraan, pemilik, &servis, nk, np, &ns)
 		case 3:
 			riwayatServis(servis, ns)
-		case 4:
-			statistikServis(servis, ns)
 		case 0:
 			fmt.Println()
 			fmt.Println("----Terima kasih telah menggunakan aplikasi ini----")
@@ -139,10 +133,9 @@ func menu_utama() {
 	fmt.Printf("| %-58s |\n", "[1] Manajemen Kendaraan")
 	fmt.Printf("| %-58s |\n", "[2] Tambah Riwayat Servis")
 	fmt.Printf("| %-58s |\n", "[3] Riwayat Servis")
-	fmt.Printf("| %-58s |\n", "[4] Statistik Servis")
 	fmt.Printf("| %-58s |\n", "[0] Exit")
 	fmt.Println("==============================================================")
-	fmt.Print("Pilih [1/2/3/4/0]? ")
+	fmt.Print("Pilih [1/2/3/0]? ")
 }
 
 func manajemenKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *int) {
@@ -280,7 +273,7 @@ func daftarKendaraan(kendaraan tabKendaraan, n int, pemilik tabPemilik, np int) 
 		fmt.Println("+------------+----------------+----------------+----------------+----------------+----------------+---------+--------------+")
 
 		for i = 0; i < n; i++ {
-			idxPemilik = dataPemilik(pemilik, np, kendaraan[i].idPemilik) // untuk memeriksa pemilik dari kendaraan, dengan idPemilik mencocokan idPemilik di tab kendaraan dan idPemilik di tab pemilik
+			idxPemilik = dataPemilik(pemilik, np, kendaraan[i].idPemilik, 0) // untuk memeriksa pemilik dari kendaraan, dengan idPemilik mencocokan idPemilik di tab kendaraan dan idPemilik di tab pemilik
 
 			if idxPemilik != -1 {
 				fmt.Printf("| %-10d | %-14s | %-14s | %-14s | %-14s | %-14s | %-7d | %-12s |\n",
@@ -290,17 +283,6 @@ func daftarKendaraan(kendaraan tabKendaraan, n int, pemilik tabPemilik, np int) 
 		}
 		fmt.Println("+------------+----------------+----------------+----------------+----------------+----------------+---------+--------------+")
 	}
-}
-
-func dataPemilik(A tabPemilik, n int, id int) int { // Memeriksa setiap elemen array pemilik untuk mencari id yang sesuai.
-	/* Mengembalikan indeks pemilik berdasarkan id yang dicari atau -1 jika data tidak ditemukan. */
-	var i int
-	for i = 0; i < n; i++ { //
-		if A[i].idPemilik == id {
-			return i
-		}
-	}
-	return -1
 }
 
 func dataPemilik(A tabPemilik, n, id, i int) int {
@@ -330,7 +312,7 @@ func tambahKendaraan(kendaraan *tabKendaraan, n *int, pemilik *tabPemilik, np *i
 		for tambah == "Ya" {
 			fmt.Print("Masukkan ID Pemilik: ")
 			fmt.Scan(&idPemilik)
-			idx = dataPemilik(*pemilik, *np, idPemilik) // untuk mencari apakah idPemilik sudah terdaftar
+			idx = dataPemilik(*pemilik, *np, idPemilik, 0) // untuk mencari apakah idPemilik sudah terdaftar
 			// jika belum terdaftar maka harus menambahkan pemilik
 			if idx == -1 {
 				fmt.Printf("Pemilik tidak ditemukan\n")
@@ -751,7 +733,7 @@ func tambahRiwayatServis(kendaraan tabKendaraan, pemilik tabPemilik, servis *tab
 			(*servis)[*ns].tahun = kendaraan[idx].tahun
 			(*servis)[*ns].warna = kendaraan[idx].warna
 
-			idxpemilik = dataPemilik(pemilik, np, kendaraan[idx].idPemilik)
+			idxpemilik = dataPemilik(pemilik, np, kendaraan[idx].idPemilik, 0)
 			(*servis)[*ns].namaPemilik = pemilik[idxpemilik].namaPemilik // Disambungin dulu kendaraan sama pemiliknya pake binary
 			(*servis)[*ns].no_telp = pemilik[idxpemilik].no_telp
 			fmt.Printf("Tanggal Servis [dd mm yyyy] %1s ", ":")
@@ -767,7 +749,6 @@ func tambahRiwayatServis(kendaraan tabKendaraan, pemilik tabPemilik, servis *tab
 	}
 
 }
-
 func riwayatServis(servis tabServis, ns int) {
 	/* IS      : Terdefinisi array servis dengan jumlah data ns
 	   Proses  : Menampilkan seluruh data riwayat servis kendaraan
@@ -790,89 +771,5 @@ func riwayatServis(servis tabServis, ns int) {
 		}
 
 		fmt.Println("+------+----------------+--------------+------------+------------+------------+------------+------------------+")
-	}
-}
-
-func statistikServis(servis tabServis, ns int) {
-	/* IS : Terdefinisi data servis sebanyak ns
-	   FS : Menampilkan statistik jumlah servis per bulan pada tahun tertentu dan kategori servis yang paling sering muncul */
-
-	var jumlahBulan [12]int
-	var kategori [12][9]int
-
-	var namaBulan = [12]string{
-		"Januari", "Februari", "Maret", "April",
-		"Mei", "Juni", "Juli", "Agustus",
-		"September", "Oktober", "November", "Dessember",
-	}
-	var namaServis = [9]string{
-		"Ringan", "Berkala", "Menengah", "Besar",
-		"Lanjutan", "Mesin", "Rem", "Ban", "Transmisi",
-	}
-
-	var tahunCari int
-	var i, bulan, j int
-	var ada bool
-	var maxBulan, maxKategori int
-
-	fmt.Print("Masukkan tahun yang ingin ditampilkan: ")
-	fmt.Scan(&tahunCari)
-
-	for i = 0; i < ns; i++ {
-		if servis[i].year == tahunCari {
-			ada = true
-			bulan = servis[i].month - 1
-			if bulan >= 0 && bulan < 12 {
-				jumlahBulan[bulan]++
-				switch servis[i].jenisServis {
-				case "Servis Ringan":
-					kategori[bulan][0]++
-				case "Servis Berkala":
-					kategori[bulan][1]++
-				case "Servis Menengah":
-					kategori[bulan][2]++
-				case "Servis Besar":
-					kategori[bulan][3]++
-				case "Servis Lanjutan":
-					kategori[bulan][4]++
-				case "Servis Mesin":
-					kategori[bulan][5]++
-				case "Servis Rem":
-					kategori[bulan][6]++
-				case "Servis Ban":
-					kategori[bulan][7]++
-				case "Servis Transmisi":
-					kategori[bulan][8]++
-				}
-			}
-		}
-	}
-
-	if !ada {
-		fmt.Printf("Tidak ada data servis pada tahun %d\n", tahunCari)
-		return
-	}
-
-	fmt.Println("\n==============================================================")
-	fmt.Printf("STATISTIK SERVIS TAHUN %d\n", tahunCari)
-	fmt.Println("==============================================================")
-	fmt.Printf("%-12s %-15s %-20s\n", "Bulan", "Jumlah Servis", "Kategori Terbanyak")
-	fmt.Println("--------------------------------------------------------------")
-	maxBulan = 0
-	for i = 0; i < 12; i++ {
-		if jumlahBulan[i] == 0 {
-			fmt.Printf("%-12s %-15d %-20s\n", namaBulan[i], 0, "-")
-		} else {
-			maxKategori = 0
-			for j = 1; j < 9; j++ {
-				if kategori[i][j] > kategori[i][maxKategori] {
-					maxKategori = j
-				}
-			}
-			fmt.Printf("%-12s %-15d %-20s\n", namaBulan[i], jumlahBulan[i], namaServis[maxKategori])
-		}
-		if jumlahBulan[i] > jumlahBulan[maxBulan] {
-			maxBulan = i
-		}
 	}
 }
