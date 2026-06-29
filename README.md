@@ -5,7 +5,7 @@
 APLIKASI MANAJEMEN KENDARAAN (AUTOCARE 0.5)
 
 **Deskripsi Program :**   
-Program ini merupakan aplikasi sederhana manajemen kendaraan berdasarkan untuk mengelola data kendaraan dan pemeliharaan
+Program ini merupakan aplikasi sederhana manajemen kendaraan untuk mengelola data kendaraan dan pemeliharaan
 teknis secara berkala. Data utama yang digunakan adalah data kendaraan, data pemilik, dan data riwayat servis. Dimana
 pengguna aplikasi adalah admin bengkel atau manajer operasional armada.
 
