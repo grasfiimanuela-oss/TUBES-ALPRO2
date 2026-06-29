@@ -17,9 +17,9 @@ Fitur :
  1. Manajemen Kendaraan:
     -Menampilkan daftar data kendaraan
     -Menambah Data Kendaraan & Data Pemilik
-    -Mencari Data Kendaraan berdaasarkan Plat, Merk, Model, Tahun
     -Mengupdate Data Kendaraan
     -Menghapus Data Kendaraan
+	-Mencari Data Kendaraan berdaasarkan Plat, Merk, Model, Tahun
     -Menyortir Data Kendaraan berdasarkan Plat, Merk, Model,Tahun, Warna secara ascending maupun descending
 
  2. Tambah Riwayat Servis Kendaraan
